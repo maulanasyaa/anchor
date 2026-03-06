@@ -15,6 +15,7 @@
   "build": {
     "appId": "com.anchor.links",
     "productName": "Anchor",
+    "publish": "never",
     "directories": {
       "output": "dist-electron",
       "buildResources": "public"
