@@ -9,7 +9,6 @@
   [![GitHub forks](https://img.shields.io/github/forks/maulanasyaa/anchor?style=social)](https://github.com/maulanasyaa/anchor/network/members)
   [![GitHub issues](https://img.shields.io/github/issues/maulanasyaa/anchor)](https://github.com/maulanasyaa/anchor/issues)
   [![GitHub last commit](https://img.shields.io/github/last-commit/maulanasyaa/anchor)](https://github.com/maulanasyaa/anchor/commits/main)
-  [![CI](https://github.com/maulanasyaa/anchor/actions/workflows/ci.yml/badge.svg)](https://github.com/maulanasyaa/anchor/actions)
 
   <br/>
 
@@ -174,8 +173,6 @@ Contributions are welcome and greatly appreciated!
 3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on the code of conduct and contribution guidelines.
 
 ---
 
