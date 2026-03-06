@@ -7,15 +7,15 @@
   "main": "electron/main.js",
   "scripts": {
     "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
-    "build": "vite build && electron-builder",
-    "build:mac": "vite build && electron-builder --mac",
-    "build:win": "vite build && electron-builder --win",
+    "build": "vite build && electron-builder --publish never",
+    "build:mac": "vite build && electron-builder --mac --publish never",
+    "build:win": "vite build && electron-builder --win --publish never",
+    "build:linux": "vite build && electron-builder --linux --publish never",
     "preview": "vite preview"
   },
   "build": {
     "appId": "com.anchor.links",
     "productName": "Anchor",
-    "publish": "never",
     "directories": {
       "output": "dist-electron",
       "buildResources": "public"
