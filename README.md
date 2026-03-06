@@ -38,11 +38,17 @@
 | macOS (Intel) | [Anchor-0.1.0.dmg](https://github.com/maulanasyaa/anchor/releases/latest) |
 | Windows | [Anchor.Setup.0.1.0.exe](https://github.com/maulanasyaa/anchor/releases/latest) |
 
-### macOS "damaged" warning
-Run this command in Terminal:
+> **Note:** Anchor is not code-signed. You may need to bypass OS security warnings on first launch.
+
+### macOS
+Run the following command in Terminal after installing:
 ```bash
 xattr -cr /Applications/Anchor.app
 ```
+
+### Windows
+Click **"More info"** → **"Run anyway"** when the SmartScreen prompt appears.
+
 ---
 
 ## ✨ Features
