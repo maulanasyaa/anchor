@@ -23,8 +23,6 @@
 
   <br/>
 
-  ![Anchor App Screenshot](docs/screenshot.png)
-
 </div>
 
 ---
@@ -39,9 +37,7 @@
 |---|---|
 | macOS (Apple Silicon) | [Anchor-0.1.0-arm64.dmg](https://github.com/maulanasyaa/anchor/releases/latest) |
 | macOS (Intel) | [Anchor-0.1.0.dmg](https://github.com/maulanasyaa/anchor/releases/latest) |
-| Windows | Coming soon |
-
-> **macOS users:** Jika muncul peringatan "unidentified developer", klik kanan → Open.
+| Windows | [Anchor.Setup.0.1.0.exe](https://github.com/maulanasyaa/anchor/releases/latest) |
 
 ---
 
