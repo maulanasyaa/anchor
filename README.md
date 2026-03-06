@@ -40,8 +40,9 @@
 
 ### macOS "damaged" warning
 Run this command in Terminal:
+```bash
 xattr -cr /Applications/Anchor.app
-
+```
 ---
 
 ## ✨ Features
