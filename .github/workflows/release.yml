@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   build-mac:
     runs-on: macos-latest
@@ -23,7 +26,7 @@ jobs:
       - name: Build Mac
         run: npm run build:mac
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
 
       - name: Upload Mac artifacts
         uses: actions/upload-artifact@v4
@@ -48,7 +51,7 @@ jobs:
       - name: Build Windows
         run: npm run build:win
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
@@ -59,8 +62,6 @@ jobs:
   release:
     needs: [build-mac, build-windows]
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: Download Mac builds
         uses: actions/download-artifact@v4
@@ -74,12 +75,23 @@ jobs:
           name: windows-builds
           path: artifacts/win
 
-      - name: Create Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             artifacts/mac/*.dmg
             artifacts/win/*.exe
           generate_release_notes: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            ## ⚓ Anchor ${{ github.ref_name }}
+
+            ### Download
+            | Platform | File |
+            |---|---|
+            | macOS Apple Silicon (M1/M2/M3) | `Anchor-*-arm64.dmg` |
+            | macOS Intel | `Anchor-*.dmg` |
+            | Windows | `Anchor-*.exe` |
+
+            ### macOS Note
+            If you see "unidentified developer" warning:
+            Right click → Open → Open anyway
