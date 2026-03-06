@@ -219,7 +219,7 @@ export default function FolderTree({
         className="flex items-center justify-between px-3 mb-1 mt-1"
       >
         <span className="text-[10px] font-semibold text-[#4A4440] uppercase tracking-widest">
-          Library
+          Folders
         </span>
         <button
           onClick={() => { setAddingParentId(null); setIsAdding(true) }}

@@ -16,11 +16,12 @@
     "appId": "com.anchor.links",
     "productName": "Anchor",
     "directories": {
-      "output": "dist-electron"
+      "output": "dist-electron",
+      "buildResources": "public"
     },
     "mac": {
       "category": "public.app-category.productivity",
-      "icon": "public/anchor.icns",
+      "icon": "anchor.icns",
       "target": [
         {
           "target": "dmg",
@@ -33,10 +34,10 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "public/anchor.ico"
+      "icon": "anchor.ico"
     },
     "linux": {
-      "icon": "public/anchor.png"
+      "icon": "anchor.png"
     },
     "files": [
       "dist/**/*",

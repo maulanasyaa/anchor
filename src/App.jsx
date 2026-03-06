@@ -7,6 +7,8 @@ import AddUrlModal from './components/AddUrlModal'
 import LinkDetailsModal from './components/LinkDetailsModal'
 import ConfirmDialog from './components/ConfirmDialog'
 import { Search, Plus, Anchor, X, Download, Upload, SortDesc } from 'lucide-react'
+import anchorLogo from './assets/anchor.png'
+import anchorEmptyLogo from './assets/anchor-transparent.png'
 
 const COLOR_PALETTE = [
   '#5B8AF0', '#D97757', '#4CAF7D', '#E8A838',
@@ -252,9 +254,11 @@ export default function App() {
           <div className={`drag-region h-8 mb-4 flex items-center transition-all duration-300 ease-in-out justify-start overflow-hidden ${
             sidebarOpen ? "pl-3" : "pl-[28px]"
           }`}>
-            <div className="w-6 h-6 rounded-lg bg-[#D97757] flex items-center justify-center flex-shrink-0">
-              <Anchor size={13} className="text-white" />
-            </div>
+            <img 
+              src={anchorLogo} 
+              alt="Anchor Logo"
+              className="w-6 h-6 rounded-lg flex-shrink-0 object-cover" 
+            />
             <span
               className={`no-drag text-sm font-semibold text-[#E8E3DC] whitespace-pre overflow-hidden transition-all duration-300 ease-in-out ${
                 sidebarOpen ? "max-w-[100px] opacity-100 ml-2.5" : "max-w-0 opacity-0 ml-0"
@@ -391,7 +395,7 @@ export default function App() {
           ) : sortedLinks.length === 0 ? (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center h-full gap-4">
               <div className="w-16 h-16 rounded-2xl bg-[#242120] border border-[#2E2A27] flex items-center justify-center">
-                <Anchor size={28} className="text-[#3A3530]" />
+                <img src={anchorEmptyLogo} className="w-15 h-15 object-contain" />
               </div>
               <div className="text-center">
                 <p className="text-[#E8E3DC] text-sm font-medium mb-1">
