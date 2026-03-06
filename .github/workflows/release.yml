@@ -90,7 +90,7 @@ jobs:
             |---|---|
             | macOS Apple Silicon (M1/M2/M3) | `Anchor-*-arm64.dmg` |
             | macOS Intel | `Anchor-*.dmg` |
-            | Windows | `Anchor-*.exe` |
+            | Windows | `Anchor.Setup.*.exe` |
 
             ### macOS Note
             If you see "unidentified developer" warning:
