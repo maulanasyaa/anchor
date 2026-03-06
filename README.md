@@ -38,6 +38,10 @@
 | macOS (Intel) | [Anchor-0.1.0.dmg](https://github.com/maulanasyaa/anchor/releases/latest) |
 | Windows | [Anchor.Setup.0.1.0.exe](https://github.com/maulanasyaa/anchor/releases/latest) |
 
+### macOS "damaged" warning
+Run this command in Terminal:
+xattr -cr /Applications/Anchor.app
+
 ---
 
 ## ✨ Features
