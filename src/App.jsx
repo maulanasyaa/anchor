@@ -56,7 +56,7 @@ export default function App() {
     const timer = setTimeout(async () => {
       const info = await window.electron?.updater?.check()
       if (info?.latestVersion) {
-        const current = '0.1.1'
+        const current = '0.1.2'
         if (info.latestVersion !== current) {
           setUpdateInfo(info)
         }
