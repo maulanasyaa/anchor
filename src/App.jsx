@@ -9,6 +9,7 @@ import ConfirmDialog from './components/ConfirmDialog'
 import BackupSettings from './components/BackupSettings'
 import ExportModal from './components/ExportModal'
 import ImportModal from './components/ImportModal'
+import UpdateBanner from './components/UpdateBanner'
 import { Search, Plus, Anchor, X, Download, Upload, SortDesc, Settings } from 'lucide-react'
 import anchorLogo from './assets/anchor.png'
 import anchorEmptyLogo from './assets/anchor-transparent.png'
@@ -35,6 +36,7 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
   const [sortBy, setSortBy] = useState('newest') // newest, oldest, az
+  const [updateInfo, setUpdateInfo] = useState(null)
   
   const [selectedLink, setSelectedLink] = useState(null)
   const [editingLink, setEditingLink] = useState(null)
@@ -48,6 +50,20 @@ export default function App() {
   const foldersRef = useRef(folders)
   useEffect(() => { linksRef.current = links }, [links])
   useEffect(() => { foldersRef.current = folders }, [folders])
+
+  // ── Update Checker ────────────────────────────────────────────────────────
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      const info = await window.electron?.updater?.check()
+      if (info?.latestVersion) {
+        const current = '0.1.1'
+        if (info.latestVersion !== current) {
+          setUpdateInfo(info)
+        }
+      }
+    }, 3000)
+    return () => clearTimeout(timer)
+  }, [])
 
   // ── Load from storage & Shortcuts ──────────────────────────────────────────
   useEffect(() => {
@@ -513,6 +529,14 @@ export default function App() {
         onConfirm={confirmDeleteLink}
         onCancel={() => setLinkToDelete(null)}
       />
+
+      {updateInfo && (
+        <UpdateBanner 
+          version={updateInfo.latestVersion}
+          releaseUrl={updateInfo.releaseUrl}
+          onDismiss={() => setUpdateInfo(null)}
+        />
+      )}
     </div>
   )
 }

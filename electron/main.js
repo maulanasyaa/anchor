@@ -269,3 +269,29 @@ ipcMain.handle('backup:open-folder', async () => {
     shell.openPath(settings.path)
   }
 })
+
+ipcMain.handle('updater:check', async () => {
+  try {
+    const https = require('https')
+    return new Promise((resolve) => {
+      const options = {
+        hostname: 'api.github.com',
+        path: '/repos/maulanasyaa/anchor/releases/latest',
+        headers: { 'User-Agent': 'Anchor-App' }
+      }
+      https.get(options, (res) => {
+        let data = ''
+        res.on('data', chunk => data += chunk)
+        res.on('end', () => {
+          try {
+            const release = JSON.parse(data)
+            resolve({ 
+              latestVersion: release.tag_name?.replace('v', ''),
+              releaseUrl: release.html_url
+            })
+          } catch { resolve(null) }
+        })
+      }).on('error', () => resolve(null))
+    })
+  } catch { return null }
+})

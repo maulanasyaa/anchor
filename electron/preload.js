@@ -23,6 +23,9 @@ contextBridge.exposeInMainWorld('electron', {
   import: {
     openFile: () => ipcRenderer.invoke('import:open-file'),
   },
+  updater: {
+    check: () => ipcRenderer.invoke('updater:check')
+  },
   onQuickAdd: (callback) => ipcRenderer.on('trigger-quick-add', () => callback()),
   onBackupRequest: (callback) => ipcRenderer.on('backup:request-data', () => callback()),
 })
