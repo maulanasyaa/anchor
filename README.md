@@ -34,9 +34,9 @@
 
 | Platform | Download |
 |---|---|
-| macOS (Apple Silicon) | [Anchor-0.1.0-arm64.dmg](https://github.com/maulanasyaa/anchor/releases/latest) |
-| macOS (Intel) | [Anchor-0.1.0.dmg](https://github.com/maulanasyaa/anchor/releases/latest) |
-| Windows | [Anchor.Setup.0.1.0.exe](https://github.com/maulanasyaa/anchor/releases/latest) |
+| macOS (Apple Silicon) | [Anchor-0.1.2-arm64.dmg](https://github.com/maulanasyaa/anchor/releases/latest) |
+| macOS (Intel) | [Anchor-0.1.2.dmg](https://github.com/maulanasyaa/anchor/releases/latest) |
+| Windows | [Anchor.Setup.0.1.2.exe](https://github.com/maulanasyaa/anchor/releases/latest) |
 
 > **Note:** Anchor is not code-signed. You may need to bypass OS security warnings on first launch.
 
