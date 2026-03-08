@@ -7,8 +7,12 @@ export function cn(...inputs) {
 
 // Fetch URL metadata (title, description, favicon)
 export async function fetchUrlMetadata(url) {
+  const domain = new URL(url).hostname
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 5000)
+
   try {
-    const res = await fetch(url)
+    const res = await fetch(url, { signal: controller.signal })
     const html = await res.text()
     const parser = new DOMParser()
     const doc = parser.parseFromString(html, 'text/html')
@@ -37,6 +41,12 @@ export async function fetchUrlMetadata(url) {
       favicon: faviconUrl,
     }
   } catch {
-    return { title: '', description: '', favicon: '' }
+    return {
+      title: '',
+      description: '',
+      favicon: `https://www.google.com/s2/favicons?domain=${domain}&sz=64`,
+    }
+  } finally {
+    clearTimeout(timeout)
   }
 }

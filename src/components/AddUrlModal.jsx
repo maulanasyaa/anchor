@@ -34,8 +34,21 @@ export default function AddUrlModal({ isOpen, onClose, onSave, folders = [], lin
   }, [isOpen, initialData])
 
   const validateUrl = (string) => {
-    const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/
-    return urlPattern.test(string.trim())
+    try {
+      const trimmed = string.trim()
+      // Pre-check: if no protocol, it must at least have a dot to be eligible for auto-prefixing
+      if (!trimmed.includes('://') && !trimmed.includes('.')) return false
+
+      const urlToCheck = trimmed.includes('://') ? trimmed : 'https://' + trimmed
+      const parsed = new URL(urlToCheck)
+      const hasTLD = parsed.hostname.includes('.') && 
+                    parsed.hostname.split('.').pop().length >= 2
+      
+      return (parsed.protocol === 'https:' || 
+              parsed.protocol === 'http:') && hasTLD
+    } catch {
+      return false
+    }
   }
 
   const duplicateLink = url.trim() ? links.find(l => {
@@ -225,8 +238,12 @@ export default function AddUrlModal({ isOpen, onClose, onSave, folders = [], lin
                 </button>
                 <button
                   onClick={handleSubmit}
-                  disabled={isSaving}
-                  className="flex-1 py-2 rounded-xl bg-[#D97757] text-white font-bold text-xs hover:bg-[#C46645] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                  disabled={isSaving || !!duplicateLink}
+                  className={`flex-1 py-2 rounded-xl text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 ${
+                    isSaving || !!duplicateLink
+                      ? 'bg-[#D97757]/50 opacity-50 cursor-not-allowed'
+                      : 'bg-[#D97757] hover:bg-[#C46645] cursor-pointer'
+                  }`}
                 >
                   {isSaving && <Loader2 size={12} className="animate-spin" />}
                   {initialData ? 'Update' : 'Save'}

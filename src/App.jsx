@@ -6,7 +6,10 @@ import UrlCard from './components/UrlCard'
 import AddUrlModal from './components/AddUrlModal'
 import LinkDetailsModal from './components/LinkDetailsModal'
 import ConfirmDialog from './components/ConfirmDialog'
-import { Search, Plus, Anchor, X, Download, Upload, SortDesc } from 'lucide-react'
+import BackupSettings from './components/BackupSettings'
+import ExportModal from './components/ExportModal'
+import ImportModal from './components/ImportModal'
+import { Search, Plus, Anchor, X, Download, Upload, SortDesc, Settings } from 'lucide-react'
 import anchorLogo from './assets/anchor.png'
 import anchorEmptyLogo from './assets/anchor-transparent.png'
 
@@ -25,6 +28,10 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isBackupSettingsOpen, setIsBackupSettingsOpen] = useState(false)
+  const [showExport, setShowExport] = useState(false)
+  const [showImport, setShowImport] = useState(false)
+  const [importData, setImportData] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
   const [sortBy, setSortBy] = useState('newest') // newest, oldest, az
@@ -35,6 +42,12 @@ export default function App() {
   
   const fileInputRef = useRef(null)
   const searchInputRef = useRef(null)
+
+  // Use refs for links/folders to avoid closure issues in IPC listener
+  const linksRef = useRef(links)
+  const foldersRef = useRef(folders)
+  useEffect(() => { linksRef.current = links }, [links])
+  useEffect(() => { foldersRef.current = folders }, [folders])
 
   // ── Load from storage & Shortcuts ──────────────────────────────────────────
   useEffect(() => {
@@ -62,6 +75,16 @@ export default function App() {
       })
     }
 
+    // Auto Backup Request listener
+    if (window.electron && window.electron.onBackupRequest) {
+      window.electron.onBackupRequest(async () => {
+        await window.electron.backup.now({
+          links: linksRef.current,
+          folders: foldersRef.current
+        })
+      })
+    }
+
     // In-App Keyboard Shortcuts
     const handleKeyDown = (e) => {
       const isCmd = e.metaKey || e.ctrlKey
@@ -77,6 +100,24 @@ export default function App() {
         e.preventDefault()
         setEditingLink(null)
         setIsModalOpen(true)
+      }
+
+      // Cmd/Ctrl + ,: Open Backup Settings
+      if (isCmd && e.key === ',') {
+        e.preventDefault()
+        setIsBackupSettingsOpen(true)
+      }
+
+      // Cmd/Ctrl + E: Open Export
+      if (isCmd && e.key.toLowerCase() === 'e') {
+        e.preventDefault()
+        setShowExport(true)
+      }
+
+      // Cmd/Ctrl + I: Open Import
+      if (isCmd && e.key.toLowerCase() === 'i') {
+        e.preventDefault()
+        handleImportClick()
       }
     }
 
@@ -138,43 +179,25 @@ export default function App() {
 
   // ── Import/Export ─────────────────────────────────────────────────────────
   const handleExport = () => {
-    const data = JSON.stringify({ links, folders }, null, 2)
-    const blob = new Blob([data], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `anchor-backup-${new Date().toISOString().split('T')[0]}.json`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
+    setShowExport(true)
   }
 
-  const handleImport = (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = async (event) => {
-      try {
-        const imported = JSON.parse(event.target.result)
-        if (imported.links) {
-          const mergedLinks = [...imported.links]
-          const existingIds = new Set(mergedLinks.map(l => l.id))
-          links.forEach(l => { if (!existingIds.has(l.id)) mergedLinks.push(l) })
-          await saveLinks(mergedLinks)
-        }
-        if (imported.folders) {
-          const mergedFolders = [...imported.folders]
-          const existingIds = new Set(mergedFolders.map(f => f.id))
-          folders.forEach(f => { if (!existingIds.has(f.id)) mergedFolders.push(f) })
-          await saveFolders(mergedFolders)
-        }
-        alert('Import successful!')
-      } catch (err) {
-        alert('Invalid backup file.')
-      }
+  const handleImportClick = async () => {
+    const data = await window.electron.import.openFile()
+    if (data) {
+      setImportData(data)
+      setShowImport(true)
     }
-    reader.readAsText(file)
+  }
+
+  const handleImportSuccess = async (newFolders, newLinks) => {
+    if (!Array.isArray(newFolders) || !Array.isArray(newLinks)) {
+      console.error('Import failed: Invalid data format')
+      return
+    }
+    // saveFolders and saveLinks already handle state update and persistence
+    await saveFolders(newFolders)
+    await saveLinks(newLinks)
   }
 
   // ── Folder actions ─────────────────────────────────────────────────────────
@@ -238,14 +261,6 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-[#1C1917] overflow-hidden">
-      <input 
-        type="file" 
-        ref={fileInputRef} 
-        onChange={handleImport} 
-        accept=".json" 
-        className="hidden" 
-      />
-
       {/* ── Sidebar ─────────────────────────────────────────────────────── */}
       <Sidebar open={sidebarOpen} setOpen={setSidebarOpen}>
         <SidebarBody className="pb-4 pt-10">
@@ -306,24 +321,42 @@ export default function App() {
           {/* Footer - Backup Actions */}
           <div className="px-3 mt-2 pt-3 border-t border-[#2E2A27] flex flex-col gap-2">
             {sidebarOpen && (
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={handleExport}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={handleExport}
+                    className="flex items-center gap-2 text-[10px] text-[#6B645C] hover:text-[#E8E3DC] transition-colors"
+                    title="Export Backup"
+                  >
+                    <Download size={12} />
+                    <span>Export</span>
+                  </button>
+                  <button 
+                    onClick={handleImportClick}
+                    className="flex items-center gap-2 text-[10px] text-[#6B645C] hover:text-[#E8E3DC] transition-colors"
+                    title="Import Backup"
+                  >
+                    <Upload size={12} />
+                    <span>Import</span>
+                  </button>
+                </div>
+                <button
+                  onClick={() => setIsBackupSettingsOpen(true)}
                   className="flex items-center gap-2 text-[10px] text-[#6B645C] hover:text-[#E8E3DC] transition-colors"
-                  title="Export Backup"
                 >
-                  <Download size={12} />
-                  <span>Export</span>
-                </button>
-                <button 
-                  onClick={() => fileInputRef.current.click()}
-                  className="flex items-center gap-2 text-[10px] text-[#6B645C] hover:text-[#E8E3DC] transition-colors"
-                  title="Import Backup"
-                >
-                  <Upload size={12} />
-                  <span>Import</span>
+                  <Settings size={12} />
+                  <span>Backup Settings</span>
                 </button>
               </div>
+            )}
+            {!sidebarOpen && (
+              <button
+                onClick={() => setIsBackupSettingsOpen(true)}
+                className="flex items-center justify-center py-2 text-[#6B645C] hover:text-[#E8E3DC] transition-colors"
+                title="Backup Settings"
+              >
+                <Settings size={14} />
+              </button>
             )}
             <motion.p
               animate={{
@@ -445,6 +478,30 @@ export default function App() {
         folders={folders}
         onEdit={(l) => { setSelectedLink(null); setEditingLink(l); setIsModalOpen(true) }}
         onDelete={(id) => { setSelectedLink(null); setLinkToDelete(links.find(l => l.id === id)) }}
+      />
+
+      <BackupSettings
+        isOpen={isBackupSettingsOpen}
+        onClose={() => setIsBackupSettingsOpen(false)}
+        links={links}
+        folders={folders}
+      />
+
+      <ExportModal
+        isOpen={showExport}
+        onClose={() => setShowExport(false)}
+        folders={folders}
+        links={links}
+        linkCounts={linkCounts}
+      />
+
+      <ImportModal
+        isOpen={showImport}
+        onClose={() => { setShowImport(false); setImportData(null) }}
+        folders={folders}
+        links={links}
+        onImport={handleImportSuccess}
+        importData={importData}
       />
 
       {/* Delete Confirmation Modal */}
